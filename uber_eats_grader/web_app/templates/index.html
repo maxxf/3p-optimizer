@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="home-container text-center py-5">
+    <h1 class="display-3 fw-bold mb-4">What's your restaurant's name?</h1>
+    <p class="lead mb-5">I'll scan your 3P storefront and help you beat your competition.</p>
+    
+    <div class="search-container mb-5">
+        <form action="{{ url_for('analyze') }}" method="post" class="d-flex justify-content-center">
+            <div class="input-group input-group-lg search-bar">
+                <input type="text" class="form-control rounded-pill" name="url" id="restaurant-search" 
+                       placeholder="Find your restaurant or paste your Uber Eats or DoorDash URL">
+                <button class="btn btn-search rounded-circle" type="submit">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="quick-actions d-flex justify-content-center flex-wrap">
+        <a href="{{ url_for('analyze') }}?focus=pricing" class="btn btn-quick-action mx-2 mb-3">
+            <i class="bi bi-currency-dollar text-success"></i> How are my competitors pricing?
+        </a>
+        <a href="{{ url_for('analyze') }}?focus=sentiment" class="btn btn-quick-action mx-2 mb-3">
+            <i class="bi bi-heart-fill text-warning"></i> What's my customer sentiment?
+        </a>
+        <a href="{{ url_for('analyze') }}?focus=menu" class="btn btn-quick-action mx-2 mb-3">
+            <i class="bi bi-menu-button-wide text-info"></i> Is my menu setup to sell?
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focus the search input when page loads
+        document.getElementById('restaurant-search').focus();
+    });
+</script>
+{% endblock %}

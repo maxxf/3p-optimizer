@@ -1,0 +1,292 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="train-container py-4">
+    <h2 class="mb-4">Train the Analysis Model</h2>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">How Training Works</h5>
+                    <p>Training helps our system learn from high-performing restaurant storefronts to improve future analyses. You can provide examples of restaurants that are performing well on delivery platforms to help calibrate our grading system.</p>
+                    
+                    <div class="alert alert-primary bg-primary bg-opacity-10 border-0">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-lightbulb-fill text-primary" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h6 class="alert-heading">Why Train the Model?</h6>
+                                <p class="mb-0">Training with your high-performing examples helps the system understand what works specifically for your restaurant category and market, leading to more accurate and relevant recommendations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">Add Training Examples</h5>
+                    
+                    <form id="training-form">
+                        <div id="examples-container">
+                            <div class="example-item mb-4 p-3 border border-secondary rounded">
+                                <div class="mb-3">
+                                    <label class="form-label">Restaurant URL</label>
+                                    <input type="url" class="form-control bg-dark text-light border-secondary" 
+                                           name="examples[0][url]" placeholder="https://www.ubereats.com/store/restaurant-url" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Why is this a good example?</label>
+                                    <textarea class="form-control bg-dark text-light border-secondary" 
+                                              name="examples[0][reason]" rows="2" 
+                                              placeholder="What makes this restaurant perform well on delivery platforms?"></textarea>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Strengths (select all that apply)</label>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="examples[0][strengths][]" value="menu">
+                                                <label class="form-check-label">Menu Structure</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="examples[0][strengths][]" value="pricing">
+                                                <label class="form-check-label">Pricing</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="examples[0][strengths][]" value="sentiment">
+                                                <label class="form-check-label">Reviews</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="examples[0][strengths][]" value="visual">
+                                                <label class="form-check-label">Visuals</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="examples[0][strengths][]" value="promotions">
+                                                <label class="form-check-label">Promotions</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Restaurant Category</label>
+                                        <select class="form-select bg-dark text-light border-secondary" name="examples[0][category]">
+                                            <option value="">Select a category</option>
+                                            <option value="burgers">Burgers</option>
+                                            <option value="pizza">Pizza</option>
+                                            <option value="sushi">Sushi</option>
+                                            <option value="mexican">Mexican</option>
+                                            <option value="italian">Italian</option>
+                                            <option value="chinese">Chinese</option>
+                                            <option value="thai">Thai</option>
+                                            <option value="indian">Indian</option>
+                                            <option value="breakfast">Breakfast</option>
+                                            <option value="sandwiches">Sandwiches</option>
+                                            <option value="salads">Salads</option>
+                                            <option value="dessert">Dessert</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <button type="button" id="add-example" class="btn btn-outline-light">
+                                <i class="bi bi-plus-circle me-2"></i> Add Another Example
+                            </button>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" id="submit-training" class="btn btn-primary btn-lg">
+                                <i class="bi bi-lightning-charge me-2"></i> Submit Training Examples
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div id="training-success" class="mt-4 text-center d-none">
+                        <div class="text-success mb-3">
+                            <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4>Training Data Submitted!</h4>
+                        <p class="text-muted">Your examples will be used to improve future analyses.</p>
+                        <a href="{{ url_for('analyze') }}" class="btn btn-primary mt-2">
+                            Analyze a Restaurant
+                        </a>
+                    </div>
+                    
+                    <div id="training-error" class="mt-4 text-center d-none">
+                        <div class="text-danger mb-3">
+                            <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4>Submission Error</h4>
+                        <p id="error-message" class="text-muted">There was an error submitting your training data.</p>
+                        <button id="retry-button" class="btn btn-outline-light mt-2">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const examplesContainer = document.getElementById('examples-container');
+        const addExampleButton = document.getElementById('add-example');
+        const trainingForm = document.getElementById('training-form');
+        const trainingSuccess = document.getElementById('training-success');
+        const trainingError = document.getElementById('training-error');
+        const errorMessage = document.getElementById('error-message');
+        const retryButton = document.getElementById('retry-button');
+        
+        let exampleCount = 1;
+        
+        // Add another example form
+        addExampleButton.addEventListener('click', function() {
+            const newExample = document.createElement('div');
+            newExample.className = 'example-item mb-4 p-3 border border-secondary rounded';
+            newExample.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Example ${exampleCount + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-example">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Restaurant URL</label>
+                    <input type="url" class="form-control bg-dark text-light border-secondary" 
+                           name="examples[${exampleCount}][url]" placeholder="https://www.ubereats.com/store/restaurant-url" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Why is this a good example?</label>
+                    <textarea class="form-control bg-dark text-light border-secondary" 
+                              name="examples[${exampleCount}][reason]" rows="2" 
+                              placeholder="What makes this restaurant perform well on delivery platforms?"></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Strengths (select all that apply)</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="examples[${exampleCount}][strengths][]" value="menu">
+                                <label class="form-check-label">Menu Structure</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="examples[${exampleCount}][strengths][]" value="pricing">
+                                <label class="form-check-label">Pricing</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="examples[${exampleCount}][strengths][]" value="sentiment">
+                                <label class="form-check-label">Reviews</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="examples[${exampleCount}][strengths][]" value="visual">
+                                <label class="form-check-label">Visuals</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="examples[${exampleCount}][strengths][]" value="promotions">
+                                <label class="form-check-label">Promotions</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Restaurant Category</label>
+                        <select class="form-select bg-dark text-light border-secondary" name="examples[${exampleCount}][category]">
+                            <option value="">Select a category</option>
+                            <option value="burgers">Burgers</option>
+                            <option value="pizza">Pizza</option>
+                            <option value="sushi">Sushi</option>
+                            <option value="mexican">Mexican</option>
+                            <option value="italian">Italian</option>
+                            <option value="chinese">Chinese</option>
+                            <option value="thai">Thai</option>
+                            <option value="indian">Indian</option>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="sandwiches">Sandwiches</option>
+                            <option value="salads">Salads</option>
+                            <option value="dessert">Dessert</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            
+            examplesContainer.appendChild(newExample);
+            exampleCount++;
+            
+            // Add event listener to remove button
+            const removeButton = newExample.querySelector('.remove-example');
+            removeButton.addEventListener('click', function() {
+                examplesContainer.removeChild(newExample);
+            });
+        });
+        
+        // Handle form submission
+        trainingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(trainingForm);
+            const examples = [];
+            
+            // Process form data into JSON structure
+            for (let i = 0; i < exampleCount; i++) {
+                const url = formData.get(`examples[${i}][url]`);
+                if (url) {
+                    examples.push({
+                        url: url,
+                        reason: formData.get(`examples[${i}][reason]`),
+                        strengths: formData.getAll(`examples[${i}][strengths][]`),
+                        category: formData.get(`examples[${i}][category]`)
+                    });
+                }
+            }
+            
+            // Submit data to API
+            fetch('/api/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ examples: examples })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Show success message
+                trainingForm.classList.add('d-none');
+                trainingSuccess.classList.remove('d-none');
+            })
+            .catch(error => {
+                // Show error message
+                console.error('Error submitting training data:', error);
+                trainingForm.classList.add('d-none');
+                trainingError.classList.remove('d-none');
+                errorMessage.textContent = 'There was an error submitting your training data. Please try again.';
+            });
+        });
+        
+        // Retry button
+        retryButton.addEventListener('click', function() {
+            trainingForm.classList.remove('d-none');
+            trainingError.classList.add('d-none');
+        });
+    });
+</script>
+{% endblock %}

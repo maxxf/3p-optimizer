@@ -1,0 +1,87 @@
+{
+  "restaurant_info": {
+    "name": "Shake Shack",
+    "rating": 4.8,
+    "review_count": 120,
+    "price_range": "$$",
+    "cuisine": "American",
+    "address": "123 Main St, New York, NY 10001",
+    "delivery_time": "15-25 min",
+    "delivery_fee": 2.99
+  },
+  "menu_items": [
+    {
+      "name": "ShackBurger",
+      "price": 6.99,
+      "description": "Cheeseburger topped with lettuce, tomato, and ShackSauce.",
+      "image_url": "https://example.com/burger.jpg",
+      "category": "Burgers",
+      "popular": true
+    },
+    {
+      "name": "Crinkle Cut Fries",
+      "price": 3.99,
+      "description": "Crispy, golden brown crinkle cut fries.",
+      "image_url": "https://example.com/fries.jpg",
+      "category": "Sides",
+      "popular": true
+    },
+    {
+      "name": "SmokeShack",
+      "price": 8.49,
+      "description": "Cheeseburger topped with applewood smoked bacon, chopped cherry peppers, and ShackSauce.",
+      "image_url": "https://example.com/smokeburger.jpg",
+      "category": "Burgers",
+      "popular": false
+    },
+    {
+      "name": "Chick'n Shack",
+      "price": 7.29,
+      "description": "Crispy chicken breast topped with lettuce, pickles, and buttermilk herb mayo.",
+      "image_url": "https://example.com/chicken.jpg",
+      "category": "Chicken",
+      "popular": false
+    }
+  ],
+  "reviews": [
+    {
+      "reviewer": "John D.",
+      "date": "2025-03-15",
+      "rating": 5,
+      "text": "Great food and fast delivery! The ShackBurger is always perfect."
+    },
+    {
+      "reviewer": "Sarah M.",
+      "date": "2025-03-10",
+      "rating": 4,
+      "text": "Food was good but delivery took longer than expected."
+    },
+    {
+      "reviewer": "Mike T.",
+      "date": "2025-03-05",
+      "rating": 5,
+      "text": "Best burger in town! The crinkle cut fries are amazing too."
+    }
+  ],
+  "categories": [
+    "Popular Items",
+    "Burgers",
+    "Chicken",
+    "Sides",
+    "Drinks"
+  ],
+  "promotions": [
+    {
+      "type": "discount",
+      "description": "20% off your first order",
+      "code": "WELCOME20",
+      "active": true
+    },
+    {
+      "type": "free_delivery",
+      "description": "Free delivery on orders over $15",
+      "minimum_order": 15,
+      "active": true
+    }
+  ]
+}

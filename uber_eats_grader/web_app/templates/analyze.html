@@ -1,0 +1,142 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="analysis-container py-4">
+    <h2 class="mb-4">Analyze Your Restaurant</h2>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-body p-4">
+                    <form action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="url" class="form-label">Uber Eats Restaurant URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-light border-secondary">
+                                    <i class="bi bi-link-45deg"></i>
+                                </span>
+                                <input type="url" class="form-control bg-dark text-light border-secondary" 
+                                       id="url" name="url" placeholder="https://www.ubereats.com/store/your-restaurant-url">
+                            </div>
+                            <div class="form-text text-muted">Paste the full URL of your restaurant's Uber Eats page</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="text-muted mb-3">- OR -</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Upload Extracted Data (JSON)</label>
+                            <input type="file" class="form-control bg-dark text-light border-secondary" 
+                                   id="file" name="file" accept=".json">
+                            <div class="form-text text-muted">If you have previously extracted data, you can upload it here</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Analysis Focus</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="menu" id="focus_menu" name="focus[]" checked>
+                                    <label class="form-check-label" for="focus_menu">
+                                        Menu Structure
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="pricing" id="focus_pricing" name="focus[]" checked>
+                                    <label class="form-check-label" for="focus_pricing">
+                                        Pricing Strategy
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="sentiment" id="focus_sentiment" name="focus[]" checked>
+                                    <label class="form-check-label" for="focus_sentiment">
+                                        Customer Sentiment
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="visual" id="focus_visual" name="focus[]" checked>
+                                    <label class="form-check-label" for="focus_visual">
+                                        Visual Presentation
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="promotions" id="focus_promotions" name="focus[]" checked>
+                                    <label class="form-check-label" for="focus_promotions">
+                                        Promotion Strategy
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search me-2"></i> Analyze Restaurant
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="examples-container py-4">
+    <h3 class="mb-4">Example Restaurants</h3>
+    
+    <div class="row" id="example-restaurants">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Fetch example restaurants when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/examples')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('example-restaurants');
+                container.innerHTML = '';
+                
+                data.forEach(example => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4 mb-4';
+                    
+                    col.innerHTML = `
+                        <div class="card bg-dark h-100 border-0 shadow">
+                            <img src="${example.image}" class="card-img-top" alt="${example.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${example.name}</h5>
+                                <p class="card-text text-muted">${example.description}</p>
+                                <a href="/analyze?url=${encodeURIComponent(example.url)}" class="btn btn-outline-primary">
+                                    Analyze this restaurant
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(col);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching examples:', error);
+                document.getElementById('example-restaurants').innerHTML = 
+                    '<div class="col-12"><p class="text-center text-muted">Failed to load example restaurants</p></div>';
+            });
+            
+        // Set focus based on URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const focus = urlParams.get('focus');
+        if (focus) {
+            document.querySelectorAll('input[name="focus[]"]').forEach(checkbox => {
+                checkbox.checked = checkbox.value === focus;
+            });
+        }
+    });
+</script>
+{% endblock %}

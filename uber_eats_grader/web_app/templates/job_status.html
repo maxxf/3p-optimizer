@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="job-status-container py-4">
+    <h2 class="mb-4">Analysis in Progress</h2>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-body p-4 text-center">
+                    <div id="loading-section">
+                        <div class="spinner-border text-primary loading-spinner mb-4" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h4 id="status-message">Analyzing your restaurant...</h4>
+                        <div class="progress mt-4 mb-3 bg-secondary">
+                            <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <p id="progress-text" class="text-muted">0%</p>
+                        <p id="detail-message" class="text-muted">This may take a few minutes. Please don't close this page.</p>
+                    </div>
+                    
+                    <div id="error-section" class="d-none">
+                        <div class="text-danger mb-4">
+                            <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4>Analysis Failed</h4>
+                        <p id="error-message" class="text-muted">There was an error processing your request.</p>
+                        <a href="{{ url_for('analyze') }}" class="btn btn-outline-primary mt-3">
+                            <i class="bi bi-arrow-left me-2"></i> Try Again
+                        </a>
+                    </div>
+                    
+                    <div id="success-section" class="d-none">
+                        <div class="text-success mb-4">
+                            <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4>Analysis Complete!</h4>
+                        <p class="text-muted">Your restaurant analysis is ready to view.</p>
+                        <a id="results-link" href="#" class="btn btn-primary mt-3">
+                            <i class="bi bi-bar-chart-fill me-2"></i> View Results
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const jobId = '{{ job_id }}';
+        const loadingSection = document.getElementById('loading-section');
+        const errorSection = document.getElementById('error-section');
+        const successSection = document.getElementById('success-section');
+        const statusMessage = document.getElementById('status-message');
+        const detailMessage = document.getElementById('detail-message');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const errorMessage = document.getElementById('error-message');
+        const resultsLink = document.getElementById('results-link');
+        
+        // Function to update the UI based on job status
+        function updateStatus(data) {
+            // Update progress
+            progressBar.style.width = `${data.progress}%`;
+            progressText.textContent = `${data.progress}%`;
+            
+            // Update messages
+            statusMessage.textContent = getStatusTitle(data.status);
+            detailMessage.textContent = data.message;
+            
+            // Handle different statuses
+            if (data.status === 'completed') {
+                loadingSection.classList.add('d-none');
+                successSection.classList.remove('d-none');
+                resultsLink.href = `/results/${jobId}`;
+                clearInterval(checkInterval);
+            } else if (data.status === 'failed') {
+                loadingSection.classList.add('d-none');
+                errorSection.classList.remove('d-none');
+                errorMessage.textContent = data.message;
+                clearInterval(checkInterval);
+            }
+        }
+        
+        // Helper function to get user-friendly status titles
+        function getStatusTitle(status) {
+            switch(status) {
+                case 'pending':
+                    return 'Initializing Analysis...';
+                case 'extracting':
+                    return 'Extracting Restaurant Data...';
+                case 'analyzing':
+                    return 'Analyzing Restaurant Performance...';
+                case 'grading':
+                    return 'Generating Grades and Reports...';
+                case 'completed':
+                    return 'Analysis Complete!';
+                case 'failed':
+                    return 'Analysis Failed';
+                default:
+                    return 'Processing...';
+            }
+        }
+        
+        // Check job status every 2 seconds
+        const checkInterval = setInterval(function() {
+            fetch(`/api/job/${jobId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Job not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateStatus(data);
+                })
+                .catch(error => {
+                    console.error('Error checking job status:', error);
+                    loadingSection.classList.add('d-none');
+                    errorSection.classList.remove('d-none');
+                    errorMessage.textContent = 'Could not retrieve job status. Please try again.';
+                    clearInterval(checkInterval);
+                });
+        }, 2000);
+        
+        // Initial status check
+        fetch(`/api/job/${jobId}`)
+            .then(response => response.json())
+            .then(data => {
+                updateStatus(data);
+            })
+            .catch(error => {
+                console.error('Error checking initial job status:', error);
+            });
+    });
+</script>
+{% endblock %}

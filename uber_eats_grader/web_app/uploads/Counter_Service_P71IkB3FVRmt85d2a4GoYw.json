@@ -1,0 +1,16 @@
+{
+  "restaurant_info": {
+    "name": "Counter Service",
+    "rating": null,
+    "review_count": 0,
+    "price_range": null,
+    "cuisine": null,
+    "address": null,
+    "delivery_time": null,
+    "delivery_fee": 0
+  },
+  "menu_items": [],
+  "reviews": [],
+  "categories": [],
+  "promotions": []
+}
