@@ -1,0 +1,13 @@
+<html>
+  <head><style>body { font-family: sans-serif; max-width: 600px; margin: auto; }</style></head>
+  <body>
+    <h1>{{restaurant_name}} — Delivery Grader Report</h1>
+    <h2>Score: {{grade}} / 100</h2>
+    <h3>What’s Working</h3>
+    <ul>{% for item in report.working %}<li>{{item}}</li>{% endfor %}</ul>
+    <h3>What Needs Fixing</h3>
+    <ul>{% for item in report.fixes %}<li>{{item}}</li>{% endfor %}</ul>
+    <h3>Actionable Tips</h3>
+    <ul>{% for item in report.tips %}<li>{{item}}</li>{% endfor %}</ul>
+  </body>
+</html>
